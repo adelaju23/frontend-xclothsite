@@ -1,0 +1,44 @@
+body{
+    text-align: center;
+    background-color: rgb(87, 110, 214);
+    font-family: 'Yusei Magic', sans-serif;
+  }
+  .motto{
+    font-family: 'Notable', sans-serif;
+    margin-top: 40px;
+    color: rgb(134, 59, 177);
+  }
+  
+  .contact-info{
+    background-color:rgb(54, 58, 56);
+    padding: 30px auto 0px;
+  }
+  .data-section img{
+  width:50% ;
+  height:20% ;
+  }
+  .data-section{
+    margin-top: 5%;
+    margin-bottom: 3%;
+  }
+  .photo{
+    position: relative;
+    margin-top: 5%;
+  }
+  .detail{
+    color: rgb(213, 215, 218);
+    padding: 10px;
+    line-height: 28px;
+    text-align: justify;
+    position: absolute;
+    bottom: 0;
+    left: 25%;
+    margin: 0;
+    width: 50%;
+    background-color:rgb(56, 53, 53);
+   background:-webkit-linear-gradient(bottom,rgba(0,0,0,1),rgba(0,0,0,.4));
+   background:-moz-linear-gradient(bottom,rgba(0,0,0,1),rgba(0,0,0,.4));
+  }
+  .price {
+     float: right;
+    }

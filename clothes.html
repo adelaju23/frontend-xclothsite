@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clothes</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Notable&family=Yusei+Magic&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style2.css">
+
+  <script>
+    let clothes = [];
+
+    function compareClothes(a, b) {
+      if (a.code.toUpperCase() < b.code.toUpperCase()) return -1;
+      if (a.code.toUpperCase() > b.code.toUpperCase()) return 1;
+      // we have equal full code, see manufacturer
+      if (a.manufacturer.toUpperCase() < b.manufacturer.toUpperCase()) return -1;
+      if (a.manufacturer.toUpperCase() > b.manufacturer.toUpperCase()) return 1;
+
+      return 0;
+    }
+
+    function updateClothes(index) {
+      // will make AJAX request instead
+      const req = new XMLHttpRequest();
+      req.open("POST", "http://127.0.0.1:3000/clothes/PUT", true);
+      // set headers
+      req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      // callback when the the request is served
+      req.onload = () => {
+        console.log("Data sent to the server");
+        loadFromServer();
+      }
+      console.log("Updating data to the server");
+      req.send("id=" + clothes[index].id + "&code=" + clothes[index].code + "&image=" + clothes[index].image + "&manufacturer=" + clothes[index].manufacturer + "&description=" + clothes[index].description + "&more_details=" + clothes[index].more_details + "&promotion=" + clothes[index].promotion + "&manufacturers_id=" + clothes[index].manufacturers_id);
+    }
+
+    function resetDataEntryFields() {
+      var clCode = document.getElementById("clCode").value = "";
+      var clImage = document.getElementById("clImage").value = "";
+      var clManufacturer = document.getElementById("clManufacturer").value = "";
+      var clDescription = document.getElementById("clDescription").value = "";
+      var clMoreDetails = document.getElementById("clMoreDetails").value = "";
+      var promotion = document.getElementById("promotion").value = "";
+      var clManufacturers_id = document.getElementById("clManufacturers_id").value = "";
+
+    }
+    function addCloth() {
+      const req = new XMLHttpRequest();
+      req.open("POST", "http://127.0.0.1:3000/clothes", true);
+      req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      req.onload = () => {
+        console.log("Data sent to the server");
+        loadFromServer();
+      }
+      console.log("sending data to the server");
+      req.send("code=" + document.getElementById("clCode").value + "&image=" + document.getElementById("clImage").value + "&manufacturer=" + document.getElementById("clManufacturer").value + "&description=" + document.getElementById("clDescription").value + "&more_details=" + document.getElementById("clMoreDetails").value + "&promotion=" + document.getElementById("promotion").value + "&manufacturers_id=" + document.getElementById("clManufacturers_id").value);
+      resetDataEntryFields();
+    }
+
+
+    function displayClothes() {
+      clothes.sort(compareClothes);
+
+      const body = document.getElementById("clTableBody");
+      body.innerHTML = "";
+      for (let i = 0; i < clothes.length; i++) {
+        const row = document.createElement("tr");
+
+        let cell = document.createElement("td");
+        cell.contentEditable = true;
+        cell.addEventListener("input", (ev) => {
+          clothes[i].code = ev.target.innerHTML
+        })
+        cell.innerHTML = clothes[i].code;
+        row.appendChild(cell);
+
+        cell = document.createElement("td");
+        cell.contentEditable = true;
+        cell.addEventListener("input", (ev) => {
+          clothes[i].image = ev.target.innerHTML
+        })
+        cell.innerHTML = clothes[i].image;
+        row.appendChild(cell);
+
+        cell = document.createElement("td");
+        cell.contentEditable = true;
+        cell.addEventListener("input", (ev) => {
+          clothes[i].manufacturer = ev.target.innerHTML
+        })
+        cell.innerHTML = clothes[i].manufacturer;
+        row.appendChild(cell);
+
+        cell = document.createElement("td");
+        cell.contentEditable = true;
+        cell.addEventListener("input", (ev) => {
+          clothes[i].description = ev.target.innerHTML
+        })
+        cell.innerHTML = clothes[i].description;
+        row.appendChild(cell);
+
+        cell = document.createElement("td");
+        cell.contentEditable = true;
+        cell.addEventListener("input", (ev) => {
+          clothes[i].more_details = ev.target.innerHTML
+        })
+        cell.innerHTML = clothes[i].more_details;
+        row.appendChild(cell);
+
+        cell = document.createElement("td");
+        cell.contentEditable = true;
+        cell.addEventListener("input", (ev) => {
+          clothes[i].promotion = ev.target.innerHTML
+        })
+        cell.innerHTML = clothes[i].promotion;
+        row.appendChild(cell);
+
+        cell = document.createElement("td");
+        cell.contentEditable = true;
+        cell.addEventListener("input", (ev) => {
+          clothes[i].manufacturers_id = ev.target.innerHTML
+        })
+        cell.innerHTML = clothes[i].manufacturers_id;
+        row.appendChild(cell);
+
+        cell = document.createElement("td");
+        let button = document.createElement("button");
+        button.innerHTML = "Delete";
+        button.addEventListener("click",
+          function (event) {
+            deleteOnServer(clothes[i].id);
+          })
+        cell.appendChild(button);
+
+        button = document.createElement("button");
+        button.innerHTML = "Update";
+        button.addEventListener(
+          "click",
+          function (event) {
+            updateClothes(i);
+          }
+        )
+        cell.appendChild(button)
+        row.appendChild(cell);
+
+        body.appendChild(row);
+      }
+    }
+
+    function loadFromServer() {
+      // AJAX request to the server
+      const req = new XMLHttpRequest();
+      req.open("GET", "http://127.0.0.1:3000/clothes");
+      req.onload = function () {
+        if (req.status == 200) {
+          clothes = JSON.parse(req.response);
+          displayClothes();
+        } else {
+          clothes = [];
+          displayClothes();
+          console.error("Problem loading clothes : " + req.status);
+        }
+      };
+      req.send();
+    }
+
+    function deleteOnServer(id) {
+      console.log("Deleting from the server " + id);
+      // AJAX request from the server
+      var req = new XMLHttpRequest();
+      // the DELETE method does not work so ...
+      // req.open("DELETE", "http://127.0.0.1:3000/clothes/"+id);
+      // ... use the workaround with the GET + the DELETE path
+      req.open("GET", "http://127.0.0.1:3000/clothes/DELETE/" + id);
+      req.onload = function () {
+        if (req.status == 200) {
+          loadFromServer();
+        } else {
+          alert("Could not delete");
+          console.error("Problem deleting attendees : " + req.status);
+        }
+      };
+      req.send();
+    }
+
+    function searchOnServer() {
+      // AJAX request to the server
+      var req = new XMLHttpRequest();
+      var filter = document.getElementById("searchOnCode").value;
+      req.open("GET", "http://127.0.0.1:3000/clothes?filterCode=" + filter);
+      req.onload = function () {
+        if (req.status == 200) {
+          clothes = JSON.parse(req.response);
+          displayClothes();
+        } else {
+          alert("Error searching");
+          clothes = [];
+          displayClothes();
+          console.error("Problem loading attendees : " + req.status);
+        }
+      };
+      req.send();
+    }    
+  </script>
+</head>
+
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand"><img src="img/logo.png" alt="clothing-logo" style="width:75px; "></a>
+
+    <div class="collapse navbar-collapse" id="navbarColor02">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item "> <a class="nav-link" href="manufacturers.html" data-abc="true">Manufacturers<span
+              class="sr-only">(current)</span></a> </li>
+        <li class="nav-item active"> <a class="nav-link" data-abc="true">Clothes</a> </li>
+        <li class="nav-item"> <a class="nav-link" href="ordersplaced.html" data-abc="true">ordersplaced</a> </li>
+      </ul>
+      <form class="form-inline my-2 my-lg-0"> <input class="form-control mr-sm-2" type="text" name="searchOnCode"
+          id="searchOnCode" placeordermade="Search">
+        <button class="btn btn-secondary my-2 my-sm-0" type="submit"
+          onclick="searchOnServer(); return false;">Search</button>
+      </form>
+    </div>
+  </nav>
+
+  <div class="dataSection">
+    <form method="post" action="http://127.0.0.1:3000/clothes" id="clothesData">
+      <div class="registrationRow">
+        <label for="clCode">Code:</label>
+        <input type="text" name="clCode" id="clCode">
+      </div>
+      <div class="registrationRow">
+        <label for="clImage">Image:</label>
+        <input type="text" name="clImage" id="clImage">
+      </div>
+      <div class="registrationRow">
+        <label for="clManufacturer">Manufacturer:</label>
+        <input type="text" name="clManufacturer" id="clManufacturer">
+      </div>
+      <div class="registrationRow">
+        <label for="clDescription">Description:</label>
+        <input type="text" name="clDescription" id="clDescription">
+      </div>
+      <div class="registrationRow">
+        <label for="clMoreDetails">More details:</label>
+        <textarea rows="5" cols="60" type="text" name="clMoreDetails" id="clMoreDetails"
+          placeholder="Enter text"></textarea>
+      </div>
+      <div class="registrationRow">
+        <label for="promotion">Promotion:</label>
+        <select name="promotion" id="promotion">
+          <option value="TRUE">True</option>
+          <option value="FALSE">False</option>
+        </select>
+      </div>
+      <div class="registrationRow">
+        <label for="clManufacturers_id">Manufacturers id:</label>
+        <input type="text" name="clManufacturers_id" id="clManufacturers_id">
+      </div>
+      <div>
+        <input class="button" type="button" value="Register" onclick="addCloth();">
+        <input class="button" type="button" value="Refresh" onclick="loadFromServer();">
+      </div>
+    </form>
+
+
+    <table border= "1px;">
+      <thead style="background-color:rgb(56, 56, 56); color: white;">
+        <tr>
+          <td> Code </td>
+          <td> Image </td>
+          <td> Manufacturer </td>
+          <td> Description </td>
+          <td> More details </td>
+          <td> Promotion </td>
+          <td> Manufacturers id </td>
+          <td> Actions </td>
+        </tr>
+      </thead>
+      <tbody id="clTableBody"></tbody>
+    </table>
+  </div>
+</body>
+<script>
+  loadFromServer();
+</script>
+
+</html>
